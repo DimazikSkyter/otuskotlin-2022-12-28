@@ -1,5 +1,5 @@
 /build/
 /.gradle/
-/gradlew
-/gradlew.bat
 /.idea/
+/m1/build/
+/gradle/wrapper/gradle-wrapper.jar
