@@ -1,5 +1,15 @@
+# Ignore most compiled Java files
+*.class
+*.jar
 /build/
+/bin/
+
+# But allow the Gradle wrapper jar to be included
+!gradle/wrapper/gradle-wrapper.jar
+
 /.gradle/
 /.idea/
-/m1/build/
-/gradle/wrapper/gradle-wrapper.jar
+*.iml
+*.iws
+*.ipr
+out/
