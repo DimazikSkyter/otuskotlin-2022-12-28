@@ -1,7 +1,5 @@
 FROM openjdk:17-alpine
 
 COPY ./build/app /app
-WORKDIR /app
 
-
-CMD ["bin/m2]
+CMD ["/appbin/m2"]
