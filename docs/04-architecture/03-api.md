@@ -6,13 +6,14 @@ CRUDS(Удаление не предусмотренно)
 
 - Загрузка/замена документа будет происходить одним методом
 - Просмотр документа
+- Поиск документа по части имени
 - Просмотр метрик
 
 ### Загрузка документа
 
 ```http
 
-POST /snapshots/new
+POST /snapshots/load
 Cookies: account=..
 Content-type: application/pdf
 {
@@ -22,15 +23,20 @@ Content-type: application/pdf
 }
 
 FILE.pdf
+
+
+POST /snapshots/read
+
+POST
 ```
 
 ### Просмотр метрик
 
 ```http 
 Просмотр документ
-GET /metrics/all
+POST /metrics/all
 
-GET /metrics/visualize?date=11.03.2014&filters=str
+POST /metrics/visualize?date=11.03.2014&filters=str
 
 ```
 
