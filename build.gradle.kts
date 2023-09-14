@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm")
 }
 
 group = "ru.otus"
@@ -17,6 +17,18 @@ dependencies {
 
 subprojects {
     apply(plugin = "kotlin")
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+
+        val jupiterVersion : String by project
+
+        testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiterVersion")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jupiterVersion")
+    }
 }
 
 tasks.test {
@@ -24,5 +36,5 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
