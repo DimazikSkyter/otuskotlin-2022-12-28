@@ -50,26 +50,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SnapshotSearchResponse'
-  /document/list:
-    post:
-      summary: Get list of all available snapshots
-      operationId: listOfSnapshots
-      tags:
-        - List of available snapshots
-      requestBody:
-        description: request for search snapshot by filename
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SnapshotListRequest'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SnapshotListResponse'
-
 components:
   schemas:
     IRequest:
@@ -87,7 +67,6 @@ components:
         mapping:
           read: '#/components/schemas/SnapshotReadRequest'
           search: '#/components/schemas/SnapshotSearchRequest'
-          list: '#/components/schemas/SnapshotListRequest'
 
     SnapshotReadRequest:
       allOf:
@@ -105,10 +84,6 @@ components:
           properties:
             snapshot:
               $ref: '#/components/schemas/SnapshotSearchFilter'
-    SnapshotListRequest:
-      allOf:
-        - $ref: '#/components/schemas/IRequest'
-        - $ref: '#/components/schemas/SnapshotRequestDebug'
 
     SnapshotSearchFilter:
       type: object
@@ -182,11 +157,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SnapshotListObject'
-СДЕЛАТЬ по аналогии с SnapshotSearchResponse
-    SnapshotListResponse:
-      allOf:
-        - $ref: '#/components/schemas/IResponse'
-        - $ref: '#/components/schemas/SnapshotListObject'
 
     SnapshotResponseObject:
       type: object
