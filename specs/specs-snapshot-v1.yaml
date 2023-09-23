@@ -50,12 +50,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SnapshotSearchResponse'
+  /document/upload:
+    post:
+      summary: load new document and transform it to snapshot
+      operationId: uploadDocument
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentUploadResponse'
+
 components:
   schemas:
     IRequest:
       type: object
       description: Базовый интерфейс для всех запросов
       properties:
+        userId:
+          $ref: '#/components/schemas/UserId'
         requestType:
           type: string
           description: Поле-дескриминатор для вычисления типа запроса
@@ -65,8 +86,34 @@ components:
       discriminator:
         propertyName: requestType
         mapping:
+          upload: '#/components/schemas/DocumentUploadRequest'
           read: '#/components/schemas/SnapshotReadRequest'
           search: '#/components/schemas/SnapshotSearchRequest'
+
+    DocumentUploadRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/SnapshotRequestDebug'
+        - type: object
+          properties:
+            uploadMetaData:
+              $ref: '#/components/schemas/DocumentUploadObject'
+
+    DocumentUploadObject:
+      type: object
+      properties:
+        documentName:
+          $ref: '#/components/schemas/DocumentName'
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        file:
+          $ref: '#/components/schemas/DocumentUploadFile'
+
+    DocumentUploadFile:
+      type: string
+      format: base64
+      description: Передаваемый файл
+
 
     SnapshotReadRequest:
       allOf:
@@ -76,6 +123,7 @@ components:
           properties:
             snapshot:
               $ref: '#/components/schemas/SnapshotReadObject'
+
     SnapshotSearchRequest:
       allOf:
         - $ref: '#/components/schemas/IRequest'
@@ -116,12 +164,15 @@ components:
       type: string
       enum:
         - success
+        - in_progress
         - error
 
     IResponse:
       type: object
       description: Базовый интерфейс для всех ответов
       properties:
+        userId:
+          $ref: '#/components/schemas/UserId'
         responseType:
           type: string
           description: Поле-дескриминатор для вычисления типа запроса
@@ -140,7 +191,7 @@ components:
         mapping:
           read: '#/components/schemas/SnapshotReadResponse'
           search: '#/components/schemas/SnapshotSearchResponse'
-          list: '#/components/schemas/SnapshotListResponse'
+          upload: '#/components/schemas/DocumentUploadResponse'
 
     SnapshotReadResponse:
       allOf:
@@ -163,7 +214,7 @@ components:
       description: Данные снапшота указанного пользователем
       properties:
         metadata:
-          $ref: '#/components/schemas/SnapshotMetaDateObject'
+          $ref: '#/components/schemas/SnapshotMetaDataObject'
         snapshot:
           $ref: '#/components/schemas/SnapshotJsonObject'
         permissions:
@@ -183,28 +234,24 @@ components:
           properties:
             id:
               $ref: '#/components/schemas/SnapshotId'
-            userId:
-              $ref: '#/components/schemas/UserId'
             date:
               $ref: '#/components/schemas/SnapshotDate'
             name:
               $ref: '#/components/schemas/SnapshotName'
 
-    SnapshotMetaDateObject:
+    SnapshotMetaDataObject:
       type: object
       properties:
         id:
           $ref: '#/components/schemas/SnapshotId'
-        userId:
-          $ref: '#/components/schemas/UserId'
 
     SnapshotId:
-      type: string
-      description: Идентификатор объявления
+      type: number
+      description: Идентификатор снапшота
 
     UserId:
       type: string
-      description: Идентификатор объявления
+      description: Идентификатор пользователя
 
     SnapshotDate:
       type: string
@@ -214,6 +261,45 @@ components:
     SnapshotName:
       type: string
       description: Имя файла из которого загрузился снапшот
+
+    DocumentUploadResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/DocumentUploadResponseObject'
+
+
+    DocumentUploadResponseObject:
+      allOf:
+        - type: object
+          description: Данные возвращаемые в ответе
+          properties:
+            status:
+              $ref: '#/components/schemas/DocumentStatus'
+            message:
+              $ref: '#/components/schemas/Message'
+
+    Message:
+      type: string
+      description: описание ответа
+
+    DocumentStatus:
+      type: boolean
+      description: статус загрузки документа
+
+    DocumentName:
+      type: string
+      description: Наименование файла
+
+    DocumentDate:
+      type: string
+      description: Наименование файла
+
+    DocumentType:
+      type: string
+      enum:
+        - blood_general
+        - blood_chemistry
+      description: Тип анализа
 
     SnapshotRequestDebug:
       type: object
