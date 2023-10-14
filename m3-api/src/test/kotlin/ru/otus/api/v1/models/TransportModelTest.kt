@@ -86,11 +86,11 @@ class TransportModelTest {
     fun `should serialize readRequest` () {
         val json = apiV1Mapper.writeValueAsString(snapshotReadRequest)
 
-        assertContains(json, Regex("stub\":\"success"))
-        assertContains(json, Regex("requestType\":\"read"))
-        assertContains(json, Regex("mode\":\"${SnapshotRequestDebugMode.TEST.value}"))
-        assertContains(json, Regex("requestId\":\"$readRequestId"))
-        assertContains(json, Regex("snapshot\":\\{\"id\":\"$snapshotId"))
+        assertContains(json, "stub\":\"success")
+        assertContains(json, "requestType\":\"read")
+        assertContains(json, "mode\":\"${SnapshotRequestDebugMode.TEST.value}")
+        assertContains(json, "requestId\":\"$readRequestId")
+        assertContains(json, "snapshot\":\\{\"id\":\"$snapshotId")
     }
 
     @Test
@@ -105,11 +105,11 @@ class TransportModelTest {
     fun `should serialize searchRequest`() {
         val json = apiV1Mapper.writeValueAsString(snapshotSearchRequest)
 
-        assertContains(json, Regex("requestType\":\"search"))
-        assertContains(json, Regex("stub\":\"badTitle"))
-        assertContains(json, Regex("mode\":\"${SnapshotRequestDebugMode.STUB.value}"))
-        assertContains(json, Regex("requestId\":\"$searchRequestId"))
-        assertContains(json, Regex("snapshot\":\\{\"searchString\":\"$searchString\"}"))
+        assertContains(json, "requestType\":\"search")
+        assertContains(json, "stub\":\"badTitle")
+        assertContains(json, "mode\":\"${SnapshotRequestDebugMode.STUB.value}")
+        assertContains(json, "requestId\":\"$searchRequestId")
+        assertContains(json, "snapshot\":\\{\"searchString\":\"$searchString\"}")
     }
 
     @Test
@@ -126,11 +126,11 @@ class TransportModelTest {
 
         println(json)
 
-        assertContains(json, Regex("mode\":\"${SnapshotRequestDebugMode.STUB.value}"))
-        assertContains(json, Regex("stub\":\"${SnapshotRequestDebugStubs.SUCCESS.value}"))
-        assertContains(json, Regex("requestId\":\"$uploadRequestId"))
-        assertContains(json, Regex("userId\":\"$userId"))
-        assertContains(json, Regex("file\":\"some file in base64"))
+        assertContains(json, "mode\":\"${SnapshotRequestDebugMode.STUB.value}")
+        assertContains(json, "stub\":\"${SnapshotRequestDebugStubs.SUCCESS.value}")
+        assertContains(json, "requestId\":\"$uploadRequestId")
+        assertContains(json, "userId\":\"$userId")
+        assertContains(json, "file\":\"some file in base64")
     }
     @Test
     fun `should deserialize documentUploadRequest`() {
@@ -144,11 +144,11 @@ class TransportModelTest {
     fun `should serialize uploadResponse`() {
         val json = apiV1Mapper.writeValueAsString(uploadResponse)
 
-        assertContains(json, Regex("responseType\":\"upload"))
-        assertContains(json, Regex("errors\":null"))
-        assertContains(json, Regex("documentName\":\"$documentName"))
-        assertContains(json, Regex("documentDate\":\"$documentDate"))
-        assertContains(json, Regex("documentType\":\"$documentType"))
+        assertContains(json, "responseType\":\"upload")
+        assertContains(json, "errors\":null")
+        assertContains(json, "documentName\":\"$documentName")
+        assertContains(json, "documentDate\":\"$documentDate")
+        assertContains(json, "documentType\":\"$documentType")
     }
 
     @Test
@@ -163,13 +163,13 @@ class TransportModelTest {
     fun `should serialize snapshotReadResponse`() {
         val json = apiV1Mapper.writeValueAsString(snapshotReadResponse)
 
-        assertContains(json, Regex("responseType\":\"read"))
-        assertContains(json, Regex("requestId\":\"$readResponseId"))
-        assertContains(json, Regex("result\":\"${ResponseResult.SUCCESS.value}"))
-        assertContains(json, Regex("errors\":null"))
-        assertContains(json, Regex("id\":\"$snapshotMetaDataObjectId"))
-        assertContains(json, Regex("some json key"))
-        assertContains(json, Regex("some json value"))
+        assertContains(json, "responseType\":\"read")
+        assertContains(json, "requestId\":\"$readResponseId")
+        assertContains(json, "result\":\"${ResponseResult.SUCCESS.value}")
+        assertContains(json, "errors\":null")
+        assertContains(json, "id\":\"$snapshotMetaDataObjectId")
+        assertContains(json, "some json key")
+        assertContains(json, "some json value")
     }
 
     @Test
@@ -186,13 +186,13 @@ class TransportModelTest {
 
         println(json)
 
-        assertContains(json, Regex("responseType\":\"search"))
-        assertContains(json, Regex("requestId\":\"$searchResponseId"))
-        assertContains(json, Regex("result\":\"${ResponseResult.ERROR.value}"))
-        assertContains(json, Regex("errors\":null"))
-        assertContains(json, Regex("id\":\"$snapshotListObjectId"))
-        assertContains(json, Regex("userId\":\"$userId"))
-        assertContains(json, Regex("date\":\"$date"))
-        assertContains(json, Regex("name\":\"$nameSnapshotListObject"))
+        assertContains(json, "responseType\":\"search")
+        assertContains(json, "requestId\":\"$searchResponseId")
+        assertContains(json, "result\":\"${ResponseResult.ERROR.value}")
+        assertContains(json, "errors\":null")
+        assertContains(json, "id\":\"$snapshotListObjectId")
+        assertContains(json, "userId\":\"$userId")
+        assertContains(json, "date\":\"$date")
+        assertContains(json, "name\":\"$nameSnapshotListObject")
     }
 }
