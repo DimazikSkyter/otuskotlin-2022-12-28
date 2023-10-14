@@ -1,0 +1,112 @@
+openapi: 3.0.4
+info:
+  title: "Document upload service"
+  description: This service api give access to documents
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1
+tags:
+  - name: snapshot
+    description: Загрузка документа в систему
+paths:
+  /document/upload:
+    post:
+      summary: load new document and transform it to snapshot
+      operationId: uploadDocument
+      requestBody:
+        description: Request body
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentUploadResponse'
+
+components:
+  schemas:
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        group:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+    ResponseResult:
+      type: string
+      enum:
+        - success
+        - error
+
+    IResponse:
+      type: object
+      description: Базовый интерфейс для всех ответов
+      properties:
+        responseType:
+          type: string
+          description: Поле-дескриминатор для вычисления типа запроса
+          example: create
+        requestId:
+          type: string
+          description: Идентификатор запроса для отладки
+        result:
+          $ref: '#/components/schemas/ResponseResult'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+
+      discriminator:
+        propertyName: responseType
+        mapping:
+          create: '#/components/schemas/DocumentUploadResponse'
+
+    DocumentUploadResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/DocumentUploadResponseObject'
+
+
+    DocumentUploadResponseObject:
+      allOf:
+        - type: object
+          description: Данные возвращаемые в ответе
+          properties:
+            name:
+              $ref: '#/components/schemas/DocumentName'
+            date:
+              $ref: '#/components/schemas/DocumentDate'
+            type:
+              $ref: '#/components/schemas/DocumentType'
+
+
+    DocumentName:
+      type: string
+      description: Наименование файла
+
+    DocumentDate:
+      type: string
+      description: Наименование файла
+
+    DocumentType:
+      type: string
+      description: Тип анализа

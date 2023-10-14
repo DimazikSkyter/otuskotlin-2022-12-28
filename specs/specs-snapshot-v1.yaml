@@ -1,0 +1,342 @@
+openapi: 3.0.4
+info:
+  title: "Snapshot service"
+  description: This service api give access to documents
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1
+tags:
+  - name: snapshot
+    description: Объявление (о покупке или продаже)
+paths:
+  /document/read:
+    post:
+      summary: Method to read snapshot
+      operationId: readSnapshot
+      tags:
+        - Read
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnapshotReadRequest'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SnapshotReadResponse'
+  /document/search:
+    post:
+      summary: Method to search snapshot with parameters
+      operationId: searchSnapshot
+      tags:
+        - Search
+      requestBody:
+        description: request for search snapshot by filename
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnapshotSearchRequest'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SnapshotSearchResponse'
+  /document/upload:
+    post:
+      summary: load new document and transform it to snapshot
+      operationId: uploadDocument
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentUploadResponse'
+
+components:
+  schemas:
+    IRequest:
+      type: object
+      description: Базовый интерфейс для всех запросов
+      properties:
+        userId:
+          $ref: '#/components/schemas/UserId'
+        requestType:
+          type: string
+          description: Поле-дескриминатор для вычисления типа запроса
+        requestId:
+          type: string
+          description: Идентификатор запроса для отладки и идемпотентности
+      discriminator:
+        propertyName: requestType
+        mapping:
+          upload: '#/components/schemas/DocumentUploadRequest'
+          read: '#/components/schemas/SnapshotReadRequest'
+          search: '#/components/schemas/SnapshotSearchRequest'
+
+    DocumentUploadRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/SnapshotRequestDebug'
+        - type: object
+          properties:
+            uploadMetaData:
+              $ref: '#/components/schemas/DocumentUploadObject'
+
+    DocumentUploadObject:
+      type: object
+      properties:
+        documentName:
+          $ref: '#/components/schemas/DocumentName'
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        file:
+          $ref: '#/components/schemas/DocumentUploadFile'
+
+    DocumentUploadFile:
+      type: string
+      format: base64
+      description: Передаваемый файл
+
+
+    SnapshotReadRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/SnapshotRequestDebug'
+        - type: object
+          properties:
+            snapshot:
+              $ref: '#/components/schemas/SnapshotReadObject'
+
+    SnapshotSearchRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/SnapshotRequestDebug'
+        - type: object
+          properties:
+            snapshot:
+              $ref: '#/components/schemas/SnapshotSearchFilter'
+
+    SnapshotSearchFilter:
+      type: object
+      description: Поиск файла по части названия
+      properties:
+        searchString:
+          type: string
+          description: поиска списка по части названия
+
+    SnapshotReadObject:
+      allOf:
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/SnapshotId'
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        group:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+
+    ResponseResult:
+      type: string
+      enum:
+        - success
+        - in_progress
+        - error
+
+    IResponse:
+      type: object
+      description: Базовый интерфейс для всех ответов
+      properties:
+        userId:
+          $ref: '#/components/schemas/UserId'
+        responseType:
+          type: string
+          description: Поле-дескриминатор для вычисления типа запроса
+          example: read
+        requestId:
+          type: string
+          description: Идентификатор запроса для отладки
+        result:
+          $ref: '#/components/schemas/ResponseResult'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      discriminator:
+        propertyName: responseType
+        mapping:
+          read: '#/components/schemas/SnapshotReadResponse'
+          search: '#/components/schemas/SnapshotSearchResponse'
+          upload: '#/components/schemas/DocumentUploadResponse'
+
+    SnapshotReadResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/SnapshotResponseObject'
+
+    SnapshotSearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          description: список снапшотов
+          properties:
+            list:
+              type: array
+              items:
+                $ref: '#/components/schemas/SnapshotListObject'
+
+    SnapshotResponseObject:
+      type: object
+      description: Данные снапшота указанного пользователем
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SnapshotMetaDataObject'
+        snapshot:
+          $ref: '#/components/schemas/SnapshotJsonObject'
+        permissions:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/SnapshotPermissions'
+
+    SnapshotJsonObject:
+      type: string
+      description: Данные snapshot
+
+    SnapshotListObject:
+      allOf:
+        - type: object
+          description: Список файлов наименования, дата, тип и id
+          properties:
+            id:
+              $ref: '#/components/schemas/SnapshotId'
+            date:
+              $ref: '#/components/schemas/SnapshotDate'
+            name:
+              $ref: '#/components/schemas/SnapshotName'
+
+    SnapshotMetaDataObject:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/SnapshotId'
+
+    SnapshotId:
+      type: number
+      description: Идентификатор снапшота
+
+    UserId:
+      type: string
+      description: Идентификатор пользователя
+
+    SnapshotDate:
+      type: string
+      format: date
+      description: Дата снапшота
+
+    SnapshotName:
+      type: string
+      description: Имя файла из которого загрузился снапшот
+
+    DocumentUploadResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/DocumentUploadResponseObject'
+
+
+    DocumentUploadResponseObject:
+      allOf:
+        - type: object
+          description: Данные возвращаемые в ответе
+          properties:
+            status:
+              $ref: '#/components/schemas/DocumentStatus'
+            message:
+              $ref: '#/components/schemas/Message'
+
+    Message:
+      type: string
+      description: описание ответа
+
+    DocumentStatus:
+      type: boolean
+      description: статус загрузки документа
+
+    DocumentName:
+      type: string
+      description: Наименование файла
+
+    DocumentDate:
+      type: string
+      description: Наименование файла
+
+    DocumentType:
+      type: string
+      enum:
+        - blood_general
+        - blood_chemistry
+      description: Тип анализа
+
+    SnapshotRequestDebug:
+      type: object
+      properties:
+        debug:
+          $ref: '#/components/schemas/SnapshotDebug'
+
+    SnapshotDebug:
+      type: object
+      properties:
+        mode:
+          $ref: '#/components/schemas/SnapshotRequestDebugMode'
+        stub:
+          $ref: '#/components/schemas/SnapshotRequestDebugStubs'
+
+    SnapshotRequestDebugMode:
+      type: string
+      enum:
+        - prod
+        - test
+        - stub
+
+    SnapshotRequestDebugStubs:
+      type: string
+      description: Перечисления всех стабов
+      enum:
+        - success
+        - notFound
+        - badId
+        - badTitle
+        - badDescription
+        - badVisibility
+        - cannotDelete
+        - badSearchString
+    SnapshotPermissions:
+      type: string
+      description: Доступы для клиента для
+      enum:
+        - public
+        - private
