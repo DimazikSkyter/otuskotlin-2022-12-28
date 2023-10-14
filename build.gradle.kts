@@ -24,6 +24,3 @@ subprojects {
         kotlinOptions.jvmTarget = "17"
     }
 }
-
-
-
