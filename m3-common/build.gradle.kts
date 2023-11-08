@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
 }
 
 group = rootProject.group
@@ -13,10 +14,13 @@ kotlin {
 
     sourceSets {
         val datetimeVersion: String by project
+        val kotlinxSerializationVersion: String by project
 
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
                 api("org.jetbrains.kotlinx:kotlinx-datetime:$datetimeVersion")
             }

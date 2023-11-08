@@ -46,13 +46,11 @@ fun EsculapContext.toTransportUpload(): IResponse = DocumentUploadResponse(
     requestId = this.requestId.asString(),
     result = this.state.toResult(),
     errors = this.errors.map { it.toError() }.toList(),
-    status = this.state == RequestState.FINISH,
-    message = message(this.state)
+    status = (this.response as ru.otus.common.model.DocumentUploadResponse).status,
+    message = (this.response as ru.otus.common.model.DocumentUploadResponse).message
 )
 
-private fun message(state: RequestState): String {
-    return if (state == RequestState.FINISH) "File successful upload" else if (state == RequestState.RUNNING) "" else "Failed to load file"
-}
+
 
 private fun OperationError.toError(): Error {
     return Error(this.code, this.group, this.field, this.message)
