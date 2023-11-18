@@ -29,12 +29,12 @@ ktor {
 
 
 dependencies {
+    implementation(project(":escalop-api"))
+    implementation(project(":escalop-common"))
+    implementation(project(":escalop-mappers"))
     val logback_version: String by project
 
-    implementation(project(":m3-api"))
-    implementation(project(":m3-common"))
-    implementation(project(":m3-mappers"))
-    implementation(project(":m4-stubs"))
+    implementation(project(":escalop-stubs"))
 
     implementation(ktor("content-negotiation"))
     implementation(ktor("core-jvm"))

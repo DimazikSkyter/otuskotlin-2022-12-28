@@ -7,8 +7,8 @@ version = rootProject.version
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(project(":m3-api"))
-    implementation(project(":m3-common"))
+    implementation(project(":escalop-api"))
+    implementation(project(":escalop-common"))
 
     testImplementation(kotlin("test-junit"))
 }

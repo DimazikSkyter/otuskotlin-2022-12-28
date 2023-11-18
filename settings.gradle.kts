@@ -1,12 +1,10 @@
-
 rootProject.name = "kotlin-homework"
-include("m1")
-include("m2")
-include("m3-api")
-include("m3-common")
-include("m3-mappers")
-include("m4-snapshot-app-ktor")
-include("m4-stubs")
+
+include("escalop-api")
+include("escalop-common")
+include("escalop-mappers")
+include("escalop-ktor-app")
+include("escalop-stubs")
 
 pluginManagement {
     val kotlinVersion: String by settings

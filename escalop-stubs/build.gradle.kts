@@ -11,9 +11,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":escalop-common"))
     val kotlinxSerializationVersion: kotlin.String by project
-
-    implementation(project(":m3-common"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
