@@ -23,8 +23,8 @@ fun EsculapContext.fromTransport(request: SnapshotSearchRequest) {
     timeStart = Clock.System.now()
     userRequest = request.snapshot?.toInternal() ?: EmptyUserRequest()
     userId = request.userId()
-    workMode = WorkMode.PROD
-    stubCase = Stubs.NONE
+    workMode = request.debug?.mode?.toWorkMode() ?: WorkMode.PROD
+    stubCase = request.debug?.stub?.let { Stubs.valueOf(it.name) } ?: Stubs.NONE
 }
 
 fun EsculapContext.fromTransport(request: SnapshotReadRequest) {
@@ -33,8 +33,8 @@ fun EsculapContext.fromTransport(request: SnapshotReadRequest) {
     timeStart = Clock.System.now()
     userRequest = request.snapshot?.toInternal() ?: EmptyUserRequest()
     userId = request.userId()
-    workMode = WorkMode.PROD
-    stubCase = Stubs.NONE
+    workMode = request.debug?.mode?.toWorkMode() ?: WorkMode.PROD
+    stubCase = request.debug?.stub?.let { Stubs.valueOf(it.name) } ?: Stubs.NONE
 }
 fun EsculapContext.fromTransport(request: DocumentUploadRequest) {
     command = UserCommand.UPLOAD
@@ -42,8 +42,12 @@ fun EsculapContext.fromTransport(request: DocumentUploadRequest) {
     timeStart = Clock.System.now()
     userRequest = request.uploadMetaData?.toInternal() ?: EmptyUserRequest()
     userId = request.userId()
-    workMode = WorkMode.PROD
-    stubCase = Stubs.NONE
+    workMode = request.debug?.mode?.toWorkMode() ?: WorkMode.PROD
+    stubCase = request.debug?.stub?.let { Stubs.valueOf(it.name) } ?: Stubs.NONE
+}
+
+private fun SnapshotRequestDebugMode.toWorkMode(): WorkMode {
+    return WorkMode.valueOf(this.name)
 }
 private fun SnapshotSearchFilter.toInternal(): SearchSnapshotRequest = SearchSnapshotRequest(
     userFilterRequest = this.searchString?.let { UserFilterRequest(it) } ?: UserFilterRequest.NONE
