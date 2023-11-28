@@ -8,30 +8,24 @@ import io.ktor.server.engine.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import ru.otus.cassandra.CassandraClientStub
+import ru.otus.escalop.plugins.initAppSettings
+import ru.otus.escalop.plugins.initPlugins
+import ru.otus.escalop.settings.EscalopAppSettings
 import ru.otus.google.GoogleCalendarStub
 import ru.otus.mapper.apiV1Mapper
 
+fun main(args: Array<String>): Unit = EngineMain.main(args)
 
-fun Application.run(processor: DocumentProcessor) {
+fun Application.module(appSettings: EscalopAppSettings = initAppSettings()) {
+    initPlugins(appSettings)
     routing {
         get("/") {
             call.respondText("Hello, world!")
         }
-        route("v1") {
-            install(ContentNegotiation) {
-                register(ContentType.Application.Json, JacksonConverter(apiV1Mapper))
-            }
-            documentOperationsCall(processor)
+        webSocket("/ws/v1") {
+            wsHandlerV1(appSettings)
         }
     }
-}
-
-
-fun main() {
-    val cassandraClient = CassandraClientStub()
-    val googleClient = GoogleCalendarStub()
-    embeddedServer(CIO, port = 8080) {
-        run(DocumentProcessor(googleClient, cassandraClient))
-    }.start(wait = true)
 }

@@ -1,32 +1,28 @@
 package ru.otus.google
 
-import kotlinx.datetime.Instant
-import ru.otus.common.entity.Snapshot
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import ru.otus.common.calendar.*
+import ru.otus.common.entity.Metric
 import ru.otus.common.model.SnapshotId
-import ru.otus.common.model.SnapshotInfo
-import ru.otus.entrails.ObjectSerializer
+import java.util.concurrent.atomic.AtomicLong
 
-class GoogleCalendarStub {
+class GoogleCalendarStub(
+    private val cache: MutableMap<Long, CalendarSnapshot> = mutableMapOf()
+): ICalendarClient {
+    private val idSupplier: AtomicLong = AtomicLong(0)
 
-    private val cache: MutableMap<String, MutableMap<Long, String>> = mutableMapOf()
+    override suspend fun readSnapshot(id: Long): CalendarSnapshot? {
+        return cache[id]
+    }
 
-    fun saveSnapshot(userId: String, snapshotId: Long, snapshot: String){
-        val userMap: MutableMap<Long, String> = cache[userId] ?: cache.let {
-            val newMap: MutableMap<Long, String> = mutableMapOf()
-            cache[userId] = newMap
-            newMap
+    override suspend fun writeSnapshot(writeRequest: WriteRequest): WriteResponse {
+        return try {
+            val id = idSupplier.getAndIncrement()
+            cache[id] = writeRequest.calendarSnapshot
+            WriteResponse(SnapshotId(id), CalendarResponseStatus.SUCCESS)
+        } catch (e: Exception) {
+            WriteResponse(null, CalendarResponseStatus.FAILED)
         }
-        userMap[snapshotId] = snapshot
-    }
-
-    fun readSnapshot(userId: String, snapshotId: Long): String? {
-        return cache[userId]?.get(snapshotId)
-    }
-
-    fun listNamesContainsSubStr(userId: String, nameFilter: String): List<SnapshotInfo> {
-        return cache[userId]?.filter { entry -> entry.value.contains(nameFilter) }?.map { entry ->
-            val snapshot: Snapshot = ObjectSerializer.snapshotInfoFromStr(entry.value)
-            SnapshotInfo(SnapshotId(snapshot.id), Instant.fromEpochMilliseconds(snapshot.date.toEpochDays().toLong() * 86400 * 1000), snapshot.name)
-        } ?: listOf()
     }
 }

@@ -23,3 +23,8 @@ fun apiV1ResponseSerialize(response: IResponse): String = apiV1Mapper.writeValue
 @Suppress("UNCHECKED_CAST")
 fun <T : IResponse> apiV1ResponseDeserialize(json: String): T =
     apiV1Mapper.readValue(json, IResponse::class.java) as T
+
+
+@Suppress("UNCHECKED_CAST")
+fun <T> apiV1ResponseDeserialize(json: String, cls: Class<T>): T =
+    apiV1Mapper.readValue(json, cls) as T

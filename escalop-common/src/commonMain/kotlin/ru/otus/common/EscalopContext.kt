@@ -3,7 +3,7 @@ package ru.otus.common
 import kotlinx.datetime.Instant
 import ru.otus.common.model.*
 
-data class EsculapContext(
+data class EscalopContext(
     var command: UserCommand = UserCommand.NONE,
     var state: RequestState = RequestState.NONE,
     var errors: MutableList<OperationError> = mutableListOf(),
