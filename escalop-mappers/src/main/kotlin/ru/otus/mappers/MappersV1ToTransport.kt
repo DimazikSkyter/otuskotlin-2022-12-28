@@ -1,21 +1,21 @@
 package ru.otus.mappers
 
 import ru.otus.api.v1.models.*
-import ru.otus.common.EsculapContext
+import ru.otus.common.EscalopContext
 import ru.otus.common.model.OperationError
 import ru.otus.common.model.RequestState
 import ru.otus.common.model.SnapshotInfo
 import ru.otus.common.model.UserCommand
 import ru.otus.exceptions.UnknownResponseCommand
 
-fun EsculapContext.toTransport(): IResponse = when (val cmd = command) {
+fun EscalopContext.toTransport(): IResponse = when (val cmd = command) {
     UserCommand.UPLOAD -> toTransportUpload()
     UserCommand.READ -> toTransportRead()
     UserCommand.SEARCH -> toTransportSearch()
     else -> throw UnknownResponseCommand(cmd)
 }
 
-fun EsculapContext.toTransportSearch() = SnapshotSearchResponse(
+fun EscalopContext.toTransportSearch() = SnapshotSearchResponse(
     userId = this.userId.asString().takeIf { it.isNotBlank() },
     requestId = this.requestId.asString(),
     result = if (this.state == RequestState.FINISH) ResponseResult.SUCCESS else ResponseResult.ERROR,
@@ -28,7 +28,7 @@ fun SnapshotInfo.toSnapshotListObject(): SnapshotListObject = SnapshotListObject
     id = this.snapshotId.get().toBigDecimal(), date = this.date.toString(), name = this.name
 )
 
-fun EsculapContext.toTransportRead() = SnapshotReadResponse(
+fun EscalopContext.toTransportRead() = SnapshotReadResponse(
     userId = this.userId.asString().takeIf { it.isNotBlank() },
     requestId = this.requestId.asString(),
     result = if (this.state == RequestState.FINISH) ResponseResult.SUCCESS else ResponseResult.ERROR,
@@ -41,7 +41,7 @@ fun EsculapContext.toTransportRead() = SnapshotReadResponse(
 
 )
 
-fun EsculapContext.toTransportUpload(): IResponse = DocumentUploadResponse(
+fun EscalopContext.toTransportUpload(): IResponse = DocumentUploadResponse(
     userId = this.userId.asString().takeIf { it.isNotBlank() },
     requestId = this.requestId.asString(),
     result = this.state.toResult(),

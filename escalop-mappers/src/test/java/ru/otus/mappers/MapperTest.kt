@@ -6,8 +6,7 @@ import org.junit.Test
 import ru.otus.api.v1.models.*
 import ru.otus.api.v1.models.SnapshotReadResponse
 import ru.otus.api.v1.models.SnapshotSearchResponse
-import ru.otus.common.EsculapContext
-import ru.otus.common.NONE
+import ru.otus.common.EscalopContext
 import ru.otus.common.model.*
 import ru.otus.common.model.DocumentType
 import java.math.BigDecimal
@@ -30,7 +29,7 @@ class MapperTest {
             uploadMetaData = DocumentUploadObject(documentName, ru.otus.api.v1.models.DocumentType.CHEMISTRY, file)
         )
 
-        val context = EsculapContext()
+        val context = EscalopContext()
         context.fromTransport(req)
 
         assertEquals(UserCommand.UPLOAD, context.command)
@@ -56,7 +55,7 @@ class MapperTest {
             )
         )
 
-        val context = EsculapContext()
+        val context = EscalopContext()
         context.fromTransport(req)
 
         assertEquals(UserCommand.READ, context.command)
@@ -79,7 +78,7 @@ class MapperTest {
             snapshot = SnapshotSearchFilter("date=$date&namePart=$namePart")
         )
 
-        val context = EsculapContext()
+        val context = EscalopContext()
         context.fromTransport(req)
 
         assertEquals(UserCommand.SEARCH, context.command)
@@ -95,7 +94,7 @@ class MapperTest {
         val requestId: RequestId = RequestId(6665)
         val userId: UserId = UserId("user_501")
         val documentName = "doc name 123"
-        val context = EsculapContext (
+        val context = EscalopContext (
             command = UserCommand.UPLOAD,
             state = RequestState.FINISH,
             errors = mutableListOf(),
@@ -127,7 +126,7 @@ class MapperTest {
         val userId: UserId = UserId("user_5221")
         val snapshotId: SnapshotId = SnapshotId(3125)
         val snapshotData = "some snapshot data json"
-        val context = EsculapContext (
+        val context = EscalopContext (
             command = UserCommand.READ,
             state = RequestState.FINISH,
             errors = mutableListOf(),
@@ -162,7 +161,7 @@ class MapperTest {
         val date = "2012-12-03T00:00:00Z"
         val docName1 = "doc 1"
         val docName2 = "doc 2"
-        val context = EsculapContext (
+        val context = EscalopContext (
             command = UserCommand.SEARCH,
             state = RequestState.FINISH,
             errors = mutableListOf(),

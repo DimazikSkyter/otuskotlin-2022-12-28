@@ -22,4 +22,4 @@ pluginManagement {
         id("org.openapi.generator") version openapiVersion apply false
     }
 }
-
+include("escalop-biz")

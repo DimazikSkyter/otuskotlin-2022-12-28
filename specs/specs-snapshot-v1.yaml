@@ -130,7 +130,7 @@ components:
         - $ref: '#/components/schemas/SnapshotRequestDebug'
         - type: object
           properties:
-            snapshot:
+            filter:
               $ref: '#/components/schemas/SnapshotSearchFilter'
 
     SnapshotSearchFilter:
@@ -139,7 +139,7 @@ components:
       properties:
         searchString:
           type: string
-          description: поиска списка по части названия
+          description: поиска списка по части названия или дате
 
     SnapshotReadObject:
       allOf:
@@ -234,6 +234,8 @@ components:
           properties:
             id:
               $ref: '#/components/schemas/SnapshotId'
+            type:
+              $ref: '#/components/schemas/DocumentType'
             date:
               $ref: '#/components/schemas/SnapshotDate'
             name:

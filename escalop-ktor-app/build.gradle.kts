@@ -1,3 +1,4 @@
+import io.ktor.plugin.features.*
 import org.jetbrains.kotlin.util.suffixIfNot
 
 plugins {
@@ -23,19 +24,25 @@ ktor {
     docker {
         localImageName.set(project.name + "-ktor")
         imageTag.set(project.version.toString())
-        jreVersion.set(io.ktor.plugin.features.JreVersion.JRE_17)
+        jreVersion.set(JreVersion.JRE_17)
     }
 }
 
 
 dependencies {
+    val logback_version: String by project
+
     implementation(project(":escalop-api"))
     implementation(project(":escalop-common"))
     implementation(project(":escalop-mappers"))
-    val logback_version: String by project
+    implementation(project(":escalop-biz"))
 
+    implementation(ktor("config-yaml"))
+    implementation(ktor("auto-head-response"))
+    implementation(ktor("caching-headers"))
+    implementation(ktor("cors"))
     implementation(project(":escalop-stubs"))
-
+    implementation(ktor("websockets"))
     implementation(ktor("content-negotiation"))
     implementation(ktor("core-jvm"))
     implementation(ktor("sessions-jvm"))
@@ -47,6 +54,7 @@ dependencies {
     testImplementation(ktor("tests-jvm"))
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation(kotlin("test"))
+    testImplementation("io.ktor:ktor-server-test-host-jvm:2.2.4")
 }
 
 tasks.getByName<Test>("test") {

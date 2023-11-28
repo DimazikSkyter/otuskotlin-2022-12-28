@@ -1,10 +1,11 @@
 package ru.otus.common.model
 
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 
 data class UserFilterRequest (
     var namePart: String?,
-    var date: Instant?,
+    var date: LocalDate?,
     var type: DocumentType?
 ) {
     constructor(str: String) : this(null, null, null ) {
@@ -17,7 +18,7 @@ data class UserFilterRequest (
                     this.namePart = it.second
                 }
                 "date" -> {
-                    this.date = Instant.parse(it.second)
+                    this.date = LocalDate.parse(it.second)
                 }
                 "type" -> {
                     this.type = DocumentType.valueOf(it.second)
