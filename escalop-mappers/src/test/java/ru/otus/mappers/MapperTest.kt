@@ -2,8 +2,10 @@ package ru.otus.mappers
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import org.junit.Test
 import ru.otus.api.v1.models.*
+import ru.otus.api.v1.models.DocumentUploadResponse
 import ru.otus.api.v1.models.SnapshotReadResponse
 import ru.otus.api.v1.models.SnapshotSearchResponse
 import ru.otus.common.EscalopContext
@@ -75,7 +77,7 @@ class MapperTest {
             userId = userId,
             requestId = requestId,
             debug = SnapshotDebug(SnapshotRequestDebugMode.PROD, SnapshotRequestDebugStubs.SUCCESS),
-            snapshot = SnapshotSearchFilter("date=$date&namePart=$namePart")
+            filter = SnapshotSearchFilter("date=$date&namePart=$namePart")
         )
 
         val context = EscalopContext()
@@ -85,7 +87,7 @@ class MapperTest {
         assertEquals(userId, context.userId.asString())
         assertEquals(requestId, context.requestId.asString())
         assertTrue { context.userRequest is SearchSnapshotRequest }
-        assertEquals(Instant.parse(date), (context.userRequest as SearchSnapshotRequest).userFilterRequest.date)
+        assertEquals(LocalDate.parse(date), (context.userRequest as SearchSnapshotRequest).userFilterRequest.date)
         assertEquals(namePart, (context.userRequest as SearchSnapshotRequest).userFilterRequest.namePart)
     }
 
@@ -185,7 +187,7 @@ class MapperTest {
         assertEquals(0, req.errors!!.size)
         assertEquals(ResponseResult.SUCCESS, req.result)
         assertEquals(2, req.list!!.size)
-        assertContains(req.list!!, SnapshotListObject(BigDecimal(333),  date, docName1))
-        assertContains(req.list!!, SnapshotListObject(BigDecimal(334),  date, docName2))
+        assertContains(req.list!!, SnapshotListObject(BigDecimal(333),  ru.otus.api.v1.models.DocumentType.GENERAL, date, docName1))
+        assertContains(req.list!!, SnapshotListObject(BigDecimal(334),  ru.otus.api.v1.models.DocumentType.GENERAL, date, docName2))
     }
 }

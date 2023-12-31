@@ -1,139 +1,85 @@
 package ru.otus.escalop.biz
 
-import kotlinx.datetime.LocalDate
-import ru.otus.common.EscalopCorSettings
 import ru.otus.common.EscalopContext
-import ru.otus.common.calendar.*
-import ru.otus.common.entity.Snapshot
-import ru.otus.common.logging.ILogWrapper
-import ru.otus.common.model.*
-import ru.otus.common.repo.DbSnapshotCreateRequest
-import ru.otus.common.repo.DbSnapshotFilterRequest
-import ru.otus.common.repo.ISnapshotRepository
-import ru.otus.entrails.ObjectSerializer
-import ru.otus.entrails.PdfTextExtractorStub
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
+import ru.otus.common.EscalopCorSettings
+import ru.otus.common.model.UserCommand
+import ru.otus.escalop.biz.workers.*
+import ru.otus.escalop.biz.workers.stubs.*
+import ru.otus.escalop.biz.workers.validation.finishValidation
+import ru.otus.escalop.biz.workers.validation.validateDocumentFormat
+import ru.otus.escalop.biz.workers.validation.validation
+import ru.otus.escalop.chain
+import ru.otus.escalop.rootChain
 
 
 class SnapshotProcessor(
-    private val corSettings: EscalopCorSettings,
-    private val logger: ILogWrapper,
-    private val calendarClient: ICalendarClient,
-    private val snapshotRepository: ISnapshotRepository
+    private val corSettings: EscalopCorSettings = EscalopCorSettings(),
 ) {
-    constructor(corSettings: EscalopCorSettings) : this(
-        corSettings,
-        corSettings.loggerProvider.logger(SnapshotProcessor::class),
-        corSettings.calendarClient(),
-        corSettings.snapshotRepository()
-    )
 
-    private val id = AtomicInteger(0)
+    suspend fun exec(ctx: EscalopContext) =
+        BusinessChain.exec(ctx.apply { this.settings = this@SnapshotProcessor.corSettings })
 
-
-    @OptIn(ExperimentalEncodingApi::class)
-    suspend fun exec(ctx: EscalopContext) {
-        require(ctx.workMode == WorkMode.STUB) {
-            "Currently working only in STUB mode."
-        }
-        when (ctx.command) {
-            UserCommand.NONE -> {
-                ctx.response = EmptyResponse()
+    companion object {
+        private val BusinessChain = rootChain<EscalopContext> {
+            initStatus("Инициализация статуса")
+            initStorage("Инициализация хранилища снапшотов")
+            initGoogleCalendar("Инициализация клиентской части работы с календарем")
+            operation("Пустая команда", UserCommand.NONE) {
+                emptyResponse("Пустой ответ на пустую команду")
             }
-
-            UserCommand.UPLOAD -> {
-                try {
-                    val request = ctx.userRequest as UploadDocumentRequest
-                    val decodedBytes = Base64.decode(request.fileBase64)
-                    val metricText: String = PdfTextExtractorStub.extract(request.documentType, decodedBytes)
-                    val metrics = ObjectSerializer.convert(metricText)
-                    val localDate: LocalDate = PdfTextExtractorStub.extractDate(decodedBytes)
-                    val id = id.getAndIncrement().toLong()
-                    val snapshot = Snapshot(
-                        id,
-                        request.documentType,
-                        localDate,
-                        metrics.map { it.name },
-                        request.documentName
-                    )
-
-                    val dbSnapshotCreateRequest = DbSnapshotCreateRequest(
-                        SnapshotId(id),
-                        snapshot,
-                        ctx.userId.asString(),
-                        false
-                    )
-                    if (!snapshotRepository.createSnapshot(dbSnapshotCreateRequest).success) {
-                        throw RuntimeException("Failed to generate new snapshot and store it to repository")
-                    }
-
-                    if (calendarClient.writeSnapshot(
-                            WriteRequest(
-                                CalendarSnapshot(
-                                    ctx.userId.asString(),
-                                    localDate,
-                                    request.documentType,
-                                    request.documentName,
-                                    metrics
-                                )
-                            )
-                        ).resultStatus == CalendarResponseStatus.SUCCESS
-                    ) {
-                        dbSnapshotCreateRequest.storeInCalendar = true
-                        snapshotRepository.updateSnapshot(dbSnapshotCreateRequest)
-                    }
-
-                    ctx.response = DocumentUploadResponse(true, "Document successful uploaded")
-                } catch (e: Exception) {
-                    logger.error(
-                        "Failed to upload snapshot",
-                        e = e,
-                        objs = mapOf(Pair("userRequest", ctx.userRequest))
-                    )
-                    ctx.response = DocumentUploadResponse(false, "Document uploaded failed")
-                    ctx.errors.add(OperationError("", "", "", "Failed to upload snapshot"))
+            operation("Загрузка нового документа", UserCommand.UPLOAD) {
+                stubs("Обработка стабов") {
+                    stubCreateSuccessResponseOnUpload("Имитация успешной обработки")
+                    stubSessionNotFoundException("Ошибка пользовательской сессии")
+//                    stubValidationBadDescription("Имитация ошибки валидации описания")
+//                    stubNoCase("Ошибка: запрошенный стаб недопустим")
                 }
-            }
+                validation {
+//                    validateAutorization("Проверка авторизации пользователя")
+                    validateDocumentFormat("Проверка документа для формирования снапшота")
 
-            UserCommand.READ -> {
-                try {
-                    val request: ReadSnapshotRequest = ctx.userRequest as ReadSnapshotRequest
-                    ctx.response = SnapshotReadResponse(
-                        request.id,
-                        ObjectSerializer.serializeSnapshotToString(
-                            calendarClient.readSnapshot(request.id.get())!!.toSnapshot(request.id.get())
-                        )
-                    )
-                } catch (e: Exception) {
-                    logger.error("Failed to read snapshot by snapshotId", e = e, objs = mapOf(Pair("snapshotId", ctx.requestId.asString())))
-                    ctx.response = SnapshotReadResponse(
-                        SnapshotId.NONE,
-                        null
-                    )
-                    ctx.errors.add(OperationError("", "", "", "Failed to read snapshot"))
+                    finishValidation("Завершение проверок")
                 }
-            }
+                chain {
+                    title = "Обработка документа"
+                    generateSnapshot("Формирование снапшота")
+                    saveSnapshotToStorage("Сохранение снапшота в кассандре")
+                    createCalendarEventWithSnapshotInformation("Сохранение снапшота в календарь")
+                    updateSnapshotInformation("Апдейт снапшта с учетом сохранения в календаре")
 
-            UserCommand.SEARCH -> {
-                var userFilterRequest: UserFilterRequest = UserFilterRequest(null, null, null)
-                try {
-                    val request: SearchSnapshotRequest = ctx.userRequest as SearchSnapshotRequest
-                    userFilterRequest = request.userFilterRequest
-                    val dbSnapshotResponse = snapshotRepository.searchSearchSnapshot(
-                        DbSnapshotFilterRequest(
-                            ctx.userId.asString(),
-                            userFilterRequest
-                        )
-                    )
-                    ctx.response = SnapshotSearchResponse(dbSnapshotResponse.snapshotsInfo ?: listOf())
-                } catch (e: Exception) {
-                    logger.error("Failed to search snapshot with filters", e = e, objs = mapOf(Pair("filters", userFilterRequest)))
-                    ctx.response = SnapshotSearchResponse(listOf())
-                    ctx.errors.add(OperationError("", "", "", "Failed to filter snapshot by filter parameters"))
+                    uploadFinished("Обработка загрузки документа завершена")
                 }
+                prepareUploadResult("Подготовка ответа")
             }
-        }
+            operation("Чтение снапшота", UserCommand.READ) {
+                stubs("Обработка стабов") {
+                    stubCreateSuccessResponseOnRead("Возврат снапшота-загрушки")
+                    stubSnapshotNotFound("Документ не найден")
+                }
+                validation {
+
+                }
+                chain {
+                    title = "Чтение документа по индексу"
+                    readSnapshotFromCalendar("Чтение документа из гугл календаря")
+                }
+                prepareReadSnapshotResult("Подготовка ответа")
+            }
+            operation("Поиск снапшота", UserCommand.SEARCH) {
+                stubs("Обработка стабов") {
+                    stubCreateSuccessResponseOnSearch("Возврат снапшота стаба")
+                    stubSnapshotNotFoundOnSearch("Документ не найден")
+                }
+                validation {
+
+                }
+                chain {
+                    title = "Поиск снапшота по параметрам"
+                    prepareDbSnapshotFilterRequest("Подготовка запроса к базе хранения метаданных по снапшотам")
+                    getSnapshotsInfoByDbSnapshotFilterRequest("Выполнение запроса по получению метаданных снапшотов, соответствующих фильтру")
+                }
+                prepareSearchSnapshotResult("Подготовка ответа по поиску снапшотов по указанным фильтрам")
+            }
+        }.build()
     }
 }

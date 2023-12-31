@@ -12,11 +12,9 @@ data class EscalopCorSettings(
     val repoProd: ISnapshotRepository = ISnapshotRepository.NONE,
     val calendarStub: ICalendarClient = ICalendarClient.NONE,
     val calendarTest: ICalendarClient = ICalendarClient.NONE,
-    val calendarProd: ICalendarClient = ICalendarClient.NONE,
-    val workMode: WorkMode = WorkMode.STUB
-) {
+    val calendarProd: ICalendarClient = ICalendarClient.NONE) {
 
-    fun snapshotRepository(): ISnapshotRepository {
+    fun snapshotRepository(workMode: WorkMode): ISnapshotRepository {
         return when(workMode) {
             WorkMode.PROD -> repoProd
             WorkMode.TEST -> repoTest
@@ -24,7 +22,7 @@ data class EscalopCorSettings(
         }
     }
 
-    fun calendarClient(): ICalendarClient {
+    fun calendarClient(workMode: WorkMode): ICalendarClient {
         return when(workMode) {
             WorkMode.PROD -> calendarProd
             WorkMode.TEST -> calendarTest
