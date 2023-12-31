@@ -66,8 +66,7 @@ class ApiTest {
                         )
                     )
                 )
-            ),
-            workMode = WorkMode.STUB
+            )
         )
     private val snapshotProcessor: SnapshotProcessor = SnapshotProcessor(escalopCorSettings)
     private val escalopAppSettings: EscalopAppSettings =
