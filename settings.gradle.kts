@@ -5,6 +5,7 @@ include("escalop-common")
 include("escalop-mappers")
 include("escalop-ktor-app")
 include("escalop-stubs")
+include("escalop-lib-cor")
 
 pluginManagement {
     val kotlinVersion: String by settings

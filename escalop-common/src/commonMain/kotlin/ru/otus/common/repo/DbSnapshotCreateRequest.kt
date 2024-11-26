@@ -9,4 +9,11 @@ data class DbSnapshotCreateRequest (
     val snapshot: Snapshot,
     val user: String,
     var storeInCalendar: Boolean
-)
+) {
+    constructor(dbSnapshotCreateRequest: DbSnapshotCreateRequest, storeInCalendar: Boolean) : this(
+        dbSnapshotCreateRequest.snapshotId,
+        dbSnapshotCreateRequest.snapshot,
+        dbSnapshotCreateRequest.user,
+        storeInCalendar
+    )
+}
