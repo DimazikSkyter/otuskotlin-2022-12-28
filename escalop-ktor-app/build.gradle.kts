@@ -19,6 +19,9 @@ val ktorVersion: String by project
 fun ktor(module: String, prefix: String = "server-", version: String? = this@Build_gradle.ktorVersion): Any =
     "io.ktor:ktor-${prefix.suffixIfNot("-")}$module:$version"
 
+application {
+    mainClass.set("io.ktor.server.cio.EngineMain")
+}
 
 ktor {
     docker {
@@ -50,6 +53,8 @@ dependencies {
     implementation(ktor("cio-jvm"))
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
+    implementation(project(mapOf("path" to ":escalop-lib-cor")))
+    implementation(project(mapOf("path" to ":escalop-lib-cor")))
 
     testImplementation(ktor("tests-jvm"))
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
