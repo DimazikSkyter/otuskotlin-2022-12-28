@@ -17,6 +17,7 @@ pluginManagement {
         kotlin("jvm") version kotlinVersion
         kotlin("multiplatform") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion apply false
+        kotlin("plugin.jpa") version kotlinVersion apply false
         id("io.kotest.multiplatform") version kotestVersion apply false
         id("io.ktor.plugin") version ktorVersion apply false
 
