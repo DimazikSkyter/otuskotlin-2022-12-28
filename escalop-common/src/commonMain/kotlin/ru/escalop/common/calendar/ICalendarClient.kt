@@ -5,15 +5,13 @@ import kotlin.uuid.Uuid
 
 interface ICalendarClient {
 
-    @OptIn(ExperimentalUuidApi::class)
-    suspend fun readSnapshot(uuid: Uuid): CalendarSnapshot?
+    suspend fun readSnapshot(uuid: String): CalendarSnapshot?
 
     suspend fun writeSnapshot(writeRequest: WriteRequest): WriteResponse
 
     companion object {
-        @ExperimentalUuidApi
         val NONE = object : ICalendarClient {
-            override suspend fun readSnapshot(uuid: Uuid): CalendarSnapshot? {
+            override suspend fun readSnapshot(uuid: String): CalendarSnapshot? {
                 TODO("Not yet implemented")
             }
 

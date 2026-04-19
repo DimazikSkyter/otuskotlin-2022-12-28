@@ -20,6 +20,7 @@ data class EscalopContext(
     var response: Response = EmptyResponse(),
 
     var snapshotRepository: ISnapshotRepository = ISnapshotRepository.NONE,
+    @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
     var calendarClient: ICalendarClient = ICalendarClient.NONE,
     var settings: EscalopCorSettings = EscalopCorSettings(),
 

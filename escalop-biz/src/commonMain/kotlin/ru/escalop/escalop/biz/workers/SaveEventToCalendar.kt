@@ -23,9 +23,10 @@ fun ICorChainDsl<EscalopContext>.createCalendarEventWithSnapshotInformation(titl
                     CalendarSnapshot(
                         userId.asString(),
                         snapshot.date,
-                        request.documentType,
                         request.documentName,
-                        prepareState.metrics
+                        request.documentType,
+                        "",
+                        prepareState.metrics,
                     )
                 )
             ).resultStatus == CalendarResponseStatus.SUCCESS) {

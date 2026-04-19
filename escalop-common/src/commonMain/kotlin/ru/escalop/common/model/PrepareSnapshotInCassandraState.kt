@@ -1,6 +1,5 @@
 package ru.escalop.common.model
 
-import ru.escalop.common.entity.Metric
 import ru.escalop.common.repo.DbSnapshotCreateRequest
 
 data class PrepareSnapshotInCassandraState(

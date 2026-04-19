@@ -1,6 +1,5 @@
 package ru.escalop.common.model
 
-import ru.escalop.common.entity.Snapshot
 
 data class SnapshotReadState (
     override var id: Long,

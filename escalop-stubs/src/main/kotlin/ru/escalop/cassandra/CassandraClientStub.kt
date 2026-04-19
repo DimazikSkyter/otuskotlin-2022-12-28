@@ -1,7 +1,7 @@
 package ru.escalop.cassandra
 
 import kotlinx.datetime.Instant
-import ru.escalop.common.entity.Snapshot
+import ru.escalop.common.model.Snapshot
 import ru.escalop.common.model.SnapshotId
 import ru.escalop.common.model.SnapshotInfo
 import ru.escalop.common.repo.*

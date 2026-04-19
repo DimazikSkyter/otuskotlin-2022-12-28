@@ -1,7 +1,7 @@
 package ru.escalop.escalop.biz.workers
 
 import ru.escalop.common.EscalopContext
-import ru.escalop.common.entity.Snapshot
+import ru.escalop.common.model.Snapshot
 import ru.escalop.common.model.EscalopState
 import ru.escalop.common.model.ReadSnapshotRequest
 import ru.escalop.common.model.RequestState
@@ -16,7 +16,7 @@ fun ICorChainDsl<EscalopContext>.readSnapshotFromCalendar(title: String) = worke
     on { state == RequestState.RUNNING }
     handle {
         val readRequest = userRequest as ReadSnapshotRequest
-        val snapshot: Snapshot = calendarClient.readSnapshot(readRequest.id.get())!!.toSnapshot(readRequest.id.get())
+        val snapshot: Snapshot = calendarClient.readSnapshot(readRequest.id.get().toString())!!.toSnapshot(readRequest.id.get())
         (states as MutableList<EscalopState>).add(SnapshotReadState(GLOBAL_INDEX.getAndIncrement(), title,  description, userId, snapshot))
     }
 }

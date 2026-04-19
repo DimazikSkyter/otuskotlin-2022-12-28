@@ -10,8 +10,11 @@ data class EscalopCorSettings(
     val repoStub: ISnapshotRepository = ISnapshotRepository.NONE,
     val repoTest: ISnapshotRepository = ISnapshotRepository.NONE,
     val repoProd: ISnapshotRepository = ISnapshotRepository.NONE,
+    @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
     val calendarStub: ICalendarClient = ICalendarClient.NONE,
+    @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
     val calendarTest: ICalendarClient = ICalendarClient.NONE,
+    @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
     val calendarProd: ICalendarClient = ICalendarClient.NONE) {
 
     fun snapshotRepository(workMode: WorkMode): ISnapshotRepository {

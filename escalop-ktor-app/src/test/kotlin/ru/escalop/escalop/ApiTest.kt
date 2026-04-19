@@ -10,7 +10,7 @@ import ru.escalop.cassandra.CassandraClientStub
 import ru.escalop.common.EscalopCorSettings
 import ru.escalop.common.calendar.CalendarSnapshot
 import ru.escalop.common.model.Metric
-import ru.escalop.common.entity.Snapshot
+import ru.escalop.common.model.Snapshot
 import ru.escalop.common.model.ValueInfo
 import ru.escalop.common.model.SnapshotId
 import ru.escalop.escalop.biz.SnapshotProcessor
@@ -35,6 +35,7 @@ class ApiTest {
                                 SnapshotId(3), Snapshot(
                                     3,
                                     ru.escalop.common.model.DocumentType.BLOOD_GENERAL,
+                                    "asd",
                                     LocalDate(2023, 1, 2),
                                     listOf("abc", "abv"),
                                     "test 1"
@@ -43,6 +44,7 @@ class ApiTest {
                                 SnapshotId(4), Snapshot(
                                     4,
                                     ru.escalop.common.model.DocumentType.BLOOD_GENERAL,
+                                    "asd",
                                     LocalDate(2023, 3, 4),
                                     listOf("abc", "abv"),
                                     "test 2"
@@ -59,6 +61,7 @@ class ApiTest {
                         CalendarSnapshot(
                             "3",
                             LocalDate(2023, 5, 5),
+                            "asd",
                             ru.escalop.common.model.DocumentType.BLOOD_GENERAL,
                             "test snapshot",
                             listOf(Metric("m1", ValueInfo(33.3, "33-34")), Metric("m2", ValueInfo(32.5, "30-34")))

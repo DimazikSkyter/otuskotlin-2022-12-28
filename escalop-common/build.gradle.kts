@@ -12,8 +12,7 @@ version = rootProject.version
 kotlin {
 
     jvm {}
-    linuxX64 {}
-
+    //удалил linux64, проблемы с библиотеками, вообще нужно оставить только мультиплатформу и jvm
     sourceSets {
         val datetimeVersion: String by project
         val kotlinxSerializationVersion: String by project

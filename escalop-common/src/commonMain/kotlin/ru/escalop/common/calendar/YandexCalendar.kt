@@ -5,9 +5,8 @@ import kotlin.uuid.Uuid
 
 class YandexCalendar: ICalendarClient {
 
-    @ExperimentalUuidApi
-    override suspend fun readSnapshot(uuid: Uuid): CalendarSnapshot? {
-        Request
+    override suspend fun readSnapshot(uuid: String): CalendarSnapshot? {
+        return null //Request
     }
 
     override suspend fun writeSnapshot(writeRequest: WriteRequest): WriteResponse {

@@ -3,7 +3,7 @@ package ru.escalop.entrails
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.escalop.common.model.Metric
-import ru.escalop.common.entity.Snapshot
+import ru.escalop.common.model.Snapshot
 
 object ObjectSerializer {
 

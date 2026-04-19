@@ -31,6 +31,7 @@ fun ICorChainDsl<EscalopContext>.generateSnapshot(title: String) = worker {
         val snapshot = Snapshot(
             id,
             request.documentType,
+            request.documentName,
             localDate,
             metrics.map { it.name },
             request.documentName
@@ -38,8 +39,8 @@ fun ICorChainDsl<EscalopContext>.generateSnapshot(title: String) = worker {
 
         val dbSnapshotCreateRequest = DbSnapshotCreateRequest(
             SnapshotId(id),
-            snapshot,
             userId.asString(),
+            snapshot,
             false
         )
 
